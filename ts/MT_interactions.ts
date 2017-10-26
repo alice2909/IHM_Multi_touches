@@ -30,9 +30,8 @@ function multiTouch(element: HTMLElement) : void {
                     let touch = evt.changedTouches.item(0);
                     pointerId_1 = touch.identifier;
                     originalMatrix =transfo.getMatrixFromElement(element);
-                    //Pt1_coord_parent = transfo.getPoint(touch.screenX, touch.screenY);
-                    Pt1_coord_element = transfo.getPoint(touch.clientX, touch.clientY);//.matrixTransform(originalMatrix.inverse());
-                    transfo.setMatrixToElement(element,originalMatrix);
+                    Pt1_coord_parent = transfo.getPoint(touch.clientX, touch.clientY);
+                    Pt1_coord_element = Pt1_coord_parent.matrixTransform(originalMatrix.inverse());
                     return true;
                 }
             },
@@ -57,6 +56,7 @@ function multiTouch(element: HTMLElement) : void {
                 useCapture: true,
                 action: (evt : TouchEvent) : boolean => {
                     // To be completed
+                    //originalMatrix = transfo.getMatrixFromElement(element);
                     return true;
                 }
             },
@@ -66,6 +66,13 @@ function multiTouch(element: HTMLElement) : void {
                 useCapture: false,
                 action: (evt : TouchEvent) : boolean => {
                     // To be completed
+                    pointerId_2 = evt.changedTouches.item(1).identifier;
+
+                    Pt2_coord_parent = transfo.getPoint(
+                        evt.changedTouches.item(1).clientX,
+                        evt.changedTouches.item(1).clientY);
+
+                    Pt2_coord_element = Pt2_coord_parent.matrixTransform(originalMatrix.inverse());
                     return true;
                 }
             },
@@ -77,6 +84,18 @@ function multiTouch(element: HTMLElement) : void {
                     evt.preventDefault();
                     evt.stopPropagation();
                     // To be completed
+
+                    Pt2_coord_parent= transfo.getPoint(
+                        evt.changedTouches.item(1).clientX,
+                        evt.changedTouches.item(1).clientY);
+
+                    transfo.rotozoom( element,
+                        originalMatrix,
+                        Pt1_coord_element,
+                        Pt1_coord_parent,
+                        Pt2_coord_element,
+                        Pt2_coord_parent
+                    )
                     return true;
                 }
             },
