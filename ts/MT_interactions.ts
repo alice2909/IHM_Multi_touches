@@ -1,12 +1,14 @@
 import { FSM } from "./FSM";
 import * as transfo from "./transfo";
 
+
 function multiTouch(element: HTMLElement) : void {
     let pointerId_1 : number, Pt1_coord_element : SVGPoint, Pt1_coord_parent : SVGPoint,
         pointerId_2 : number, Pt2_coord_element : SVGPoint, Pt2_coord_parent : SVGPoint,
-        originalMatrix : SVGMatrix,
+        originalMatrix : SVGMatrix, originalMatrixInverse : SVGMatrix,
         getRelevantDataFromEvent = (evt : TouchEvent) : Touch => {
             for(let i=0; i<evt.changedTouches.length; i++) {
+                console.log(evt);
                 let touch = evt.changedTouches.item(i);
                 if(touch.identifier === pointerId_1 || touch.identifier === pointerId_2) {
                     return touch;
@@ -25,6 +27,12 @@ function multiTouch(element: HTMLElement) : void {
                 useCapture: false,
                 action: (evt : TouchEvent) : boolean => {
                     // To be completed
+                    let touch = evt.changedTouches.item(0);
+                    pointerId_1 = touch.identifier;
+                    originalMatrix =transfo.getMatrixFromElement(element);
+                    //Pt1_coord_parent = transfo.getPoint(touch.screenX, touch.screenY);
+                    Pt1_coord_element = transfo.getPoint(touch.clientX, touch.clientY);//.matrixTransform(originalMatrix.inverse());
+                    transfo.setMatrixToElement(element,originalMatrix);
                     return true;
                 }
             },
@@ -36,6 +44,9 @@ function multiTouch(element: HTMLElement) : void {
                     evt.preventDefault();
                     evt.stopPropagation();
                     // To be completed
+                    let data = getRelevantDataFromEvent(evt);
+                    Pt1_coord_parent = transfo.getPoint(data.clientX, data.clientY);
+                    transfo.drag(element, originalMatrix, Pt1_coord_element, Pt1_coord_parent);
                     return true;
                 }
             },
